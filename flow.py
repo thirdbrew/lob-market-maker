@@ -73,6 +73,8 @@ class FlowParams:
     # informed flow thins the book faster than the makers replace it. 0.35/1 is
     # the measured floor, and it leaves a 31/69 informed/uninformed fill mix.
     depth_scale: float = 3.0        # mean distance of a new limit from the touch
+    maker_pull: float = 0.20        # how far a maker corrects the mid toward its own view
+    maker_noise: float = 4.0        # ticks of error in a maker's view of fair value
     max_size: int = 8
     seed: int = 0
 
@@ -107,8 +109,35 @@ class Flow:
             k += 1
 
     def _reference(self) -> int:
+        """Where a noise maker centres its quotes.
+
+        NOT the observed mid alone, and that distinction is load-bearing. When
+        makers posted purely around the mid, no participant in the market had any
+        opinion about value: the book was a pure beauty contest, the only force
+        connecting it to `v` was informed takers eating the touch, and the system
+        was DYNAMICALLY UNSTABLE. Measured, with an Avellaneda-Stoikov maker
+        running: the mid ran away from fair value past 200 ticks in every one of
+        eight (depth, churn) configurations tried. The loop is thin touch -> gappy
+        mid -> inflated volatility estimate -> wider quotes -> thinner touch.
+
+        Deepening the book stopped the runaway and broke the simulator a different
+        way: a deep book of makers who post once and never reprice is STALE, the
+        observed mid stops moving, the agent's volatility estimate goes to 0.00,
+        and the A-S inventory skew `q*gamma*sigma^2*tau` switches off entirely.
+        Churn reintroduced the runaway at every depth.
+
+        So the fix is not a parameter, it is the missing ingredient: a maker holds
+        a NOISY VIEW of fair value and corrects part of the way toward it. That is
+        the standard noisy-rational-expectations setup, it gives the system a
+        restoring force, and it leaves informed traders their edge -- they see `v`
+        exactly, makers see `v + noise`.
+        """
+        v = self.fair.price
         mid = self.book.mid
-        return int(round(mid)) if mid is not None else self.fair.price
+        if mid is None:
+            return v
+        view = v + self.rng.gauss(0.0, self.p.maker_noise)
+        return int(round(mid + self.p.maker_pull * (view - mid)))
 
     def _post_limits(self, n: int) -> None:
         ref = self._reference()

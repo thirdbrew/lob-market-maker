@@ -5,11 +5,16 @@ A synthetic flow generator is trivially "correct" -- it runs, it emits orders,
 nothing raises. The question that matters is whether it produces the *mechanism*
 the rest of the project needs, and that is testable.
 
-The load-bearing property is TRACKING. The agent never sees fair value; it sees
-a book, and the book is only informative because informed traders drag it toward
-fair value. If informed flow does not measurably improve tracking, there is no
-adverse selection in the simulator, and `evaluate.py`'s decomposition has two of
-its three terms pinned at zero by construction.
+The load-bearing property is ADVERSE SELECTION -- that a passive maker gets
+picked off, and more so the more informed flow there is. If that collapses,
+`evaluate.py`'s decomposition has an empty term and the whole project measures
+nothing.
+
+It is deliberately measured DIRECTLY rather than through tracking. Tracking was
+the first proxy and it was a good one until the noise makers were given their own
+noisy view of value; after that the makers did the tracking work themselves and
+the proxy went quiet while the mechanism was untouched. A proxy that stops
+tracking its target is worse than no proxy, because it keeps reporting.
 
 The regression test at the bottom is the one that earns its keep. It pins a bug
 that produced a perfectly healthy-looking run with **zero uninformed trades in
@@ -39,22 +44,64 @@ def _run(steps=4000, warmup=400, **kw):
 
 # ------------------------------------------------------------ the mechanism
 
-def test_informed_flow_improves_tracking():
-    """The property the whole simulator exists to have.
+def _adverse_drift(informed_frac, seed, steps=6000, horizon=40):
+    """Mean drift AGAINST a passive maker's fills, in ticks x size.
 
-    Without informed traders nothing connects the book to fair value: noise
-    makers post around the observed mid, which is self-referential, so the book
-    is free to wander. Informed flow is the only force pulling it back.
+    Positive means the maker was picked off: it bought and the value fell, or
+    sold and the value rose.
     """
-    _, _, _, without = _run(informed_frac=0.0, seed=1)
-    _, _, _, with_ = _run(informed_frac=0.35, informed_edge=1, seed=1)
+    from agent import NaiveMM
 
-    sd_without, sd_with = st.pstdev(without), st.pstdev(with_)
-    assert sd_with < sd_without * 0.85, (
-        f"informed flow must materially improve tracking: "
-        f"sd {sd_without:.2f} without vs {sd_with:.2f} with. If these are close, "
-        f"there is no adverse selection in this simulator and the P&L "
-        f"decomposition downstream is measuring nothing.")
+    b = Book()
+    fv = FairValue(sigma_ticks=1.0)
+    f = Flow(b, fv, FlowParams(seed=seed, informed_frac=informed_frac))
+    for _ in range(400):
+        f.step()
+    mm = NaiveMM(b, half_spread=2)
+    vpath = []
+    for t in range(steps):
+        mm.step(t, steps)
+        f.step()
+        vpath.append(fv.price)
+    mm._collect_fills()
+
+    d = []
+    for (t, side, px, qty) in mm.fills:
+        if t + horizon < len(vpath):
+            later = vpath[t + horizon]
+            d.append(qty * ((px - later) if side is Side.BID else (later - px)))
+    return st.mean(d) if d else 0.0
+
+
+def test_informed_flow_creates_adverse_selection():
+    """THE PROPERTY THE SIMULATOR EXISTS TO HAVE, measured directly.
+
+    An earlier version of this test measured TRACKING -- how closely the mid
+    followed fair value -- as a proxy, and it was a good proxy right up until
+    the noise makers were given their own noisy view of value. Once makers
+    anchored to `v` themselves, they did the tracking work and informed flow
+    barely moved it (sd 5.63 -> 5.18, ~8%). The proxy stopped measuring the
+    mechanism while the mechanism was still there.
+
+    So measure the mechanism. Adverse selection is the maker being picked off:
+    it bought just before the value fell, or sold just before it rose. That is
+    what informed flow *is*, and it scales cleanly with how much of it there is:
+
+        informed_frac   drift per fill
+             0.00            1.49
+             0.15            2.88
+             0.35            4.76
+             0.60           10.77
+
+    If this collapses, `evaluate.py`'s three-way decomposition has an empty term.
+    """
+    low = st.mean([_adverse_drift(0.0, s) for s in (1, 2, 3)])
+    high = st.mean([_adverse_drift(0.6, s) for s in (1, 2, 3)])
+    assert high > low * 3.0, (
+        f"informed flow must materially increase adverse selection: "
+        f"{low:.2f} at frac=0 vs {high:.2f} at frac=0.6. If these are close there "
+        f"is nothing for the P&L decomposition to attribute.")
+    assert low > 0, "even uninformed flow should show some drift against a maker"
 
 
 def test_informed_traders_take_the_mispriced_side():
