@@ -1,0 +1,191 @@
+{
+  "calibration": {
+    "k": 0.6303463147965173,
+    "A": 0.7198760805630163,
+    "r2": 0.9375898626725077,
+    "usable": 6
+  },
+  "calibration_rows": [
+    [
+      1,
+      0.6545555555555556
+    ],
+    [
+      2,
+      0.20055555555555557
+    ],
+    [
+      3,
+      0.08466666666666667
+    ],
+    [
+      4,
+      0.03766666666666667
+    ],
+    [
+      6,
+      0.011666666666666667
+    ],
+    [
+      8,
+      0.007666666666666667
+    ]
+  ],
+  "points": [
+    {
+      "label": "A-S",
+      "param": 0.003,
+      "inv_sd": 27.834682948114057,
+      "pnl": -286.25,
+      "spread": 1323.625,
+      "adverse": -3324.375,
+      "inventory": 1714.5,
+      "fills": 339.75
+    },
+    {
+      "label": "A-S",
+      "param": 0.01,
+      "inv_sd": 24.362190933076192,
+      "pnl": -495.5,
+      "spread": 1334.0,
+      "adverse": -2990.75,
+      "inventory": 1161.25,
+      "fills": 323.75
+    },
+    {
+      "label": "A-S",
+      "param": 0.03,
+      "inv_sd": 20.2442390751762,
+      "pnl": 384.75,
+      "spread": 1261.875,
+      "adverse": -2347.875,
+      "inventory": 1470.75,
+      "fills": 320.75
+    },
+    {
+      "label": "A-S",
+      "param": 0.1,
+      "inv_sd": 17.86513141313056,
+      "pnl": -2504.25,
+      "spread": 1391.875,
+      "adverse": -4004.375,
+      "inventory": 108.25,
+      "fills": 416.25
+    },
+    {
+      "label": "A-S",
+      "param": 0.3,
+      "inv_sd": 20.61367052444404,
+      "pnl": -3374.5,
+      "spread": 1508.75,
+      "adverse": -4237.5,
+      "inventory": -645.75,
+      "fills": 483.75
+    },
+    {
+      "label": "A-S",
+      "param": 1.0,
+      "inv_sd": 11.831053440545919,
+      "pnl": -5816.5,
+      "spread": -102.375,
+      "adverse": -5604.125,
+      "inventory": -110.0,
+      "fills": 566.75
+    },
+    {
+      "label": "A-S",
+      "param": 3.0,
+      "inv_sd": 6.9824044848865565,
+      "pnl": -19108.5,
+      "spread": -2549.625,
+      "adverse": -16620.625,
+      "inventory": 61.75,
+      "fills": 433.5
+    },
+    {
+      "label": "naive",
+      "param": 1,
+      "inv_sd": 99.1684214941516,
+      "pnl": -10625.25,
+      "spread": 2014.625,
+      "adverse": -17980.375,
+      "inventory": 5340.5,
+      "fills": 1143.75
+    },
+    {
+      "label": "naive",
+      "param": 2,
+      "inv_sd": 25.708990028290543,
+      "pnl": 1145.75,
+      "spread": 1560.125,
+      "adverse": -3926.875,
+      "inventory": 3512.5,
+      "fills": 404.5
+    },
+    {
+      "label": "naive",
+      "param": 3,
+      "inv_sd": 22.878212705408966,
+      "pnl": 32.5,
+      "spread": 859.75,
+      "adverse": -1368.5,
+      "inventory": 541.25,
+      "fills": 167.25
+    },
+    {
+      "label": "naive",
+      "param": 4,
+      "inv_sd": 16.98310280570813,
+      "pnl": 1942.25,
+      "spread": 610.625,
+      "adverse": -83.375,
+      "inventory": 1415.0,
+      "fills": 87.5
+    },
+    {
+      "label": "naive",
+      "param": 6,
+      "inv_sd": 6.6375675353105645,
+      "pnl": 387.25,
+      "spread": 452.625,
+      "adverse": 112.375,
+      "inventory": -177.75,
+      "fills": 39.75
+    },
+    {
+      "label": "naive",
+      "param": 8,
+      "inv_sd": 5.10821937902834,
+      "pnl": 779.75,
+      "spread": 355.5,
+      "adverse": 79.25,
+      "inventory": 345.0,
+      "fills": 21.75
+    },
+    {
+      "label": "naive",
+      "param": 12,
+      "inv_sd": 3.7116310417396394,
+      "pnl": 603.25,
+      "spread": 387.0,
+      "adverse": 98.75,
+      "inventory": 117.5,
+      "fills": 14.25
+    }
+  ],
+  "as_beats_naive": {
+    "checked": 4,
+    "wins": 2
+  },
+  "naive_beats_as": {
+    "checked": 7,
+    "wins": 7
+  },
+  "seeds": [
+    11,
+    12,
+    13,
+    14
+  ],
+  "steps": 6000
+}
