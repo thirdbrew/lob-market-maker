@@ -1,5 +1,7 @@
 # Limit Order Book & Market Making
 
+[![tests](https://github.com/thirdbrew/lob-market-maker/actions/workflows/tests.yml/badge.svg)](https://github.com/thirdbrew/lob-market-maker/actions/workflows/tests.yml)
+
 A price-time-priority matching engine, a synthetic market with informed traders in
 it, and two market makers — one naive, one the Avellaneda–Stoikov closed form —
 compared on a risk/return frontier rather than head-to-head.
@@ -151,7 +153,7 @@ drifting mid, the closest of the three to real flow.
 ## Running it
 
 ```bash
-pip install pytest hypothesis matplotlib
+pip install -r requirements.txt
 python -m pytest -q          # 56 tests
 python bench_book.py         # throughput
 python evaluate.py           # the decomposition + horizon sensitivity
