@@ -13,10 +13,11 @@ levels.**
 
 ![Risk/return frontier](reports/fig2_frontier.png)
 
-That is not a bug in the implementation. γ does exactly what the model says it
-should — inventory standard deviation falls from **63.6 to 7.1** as risk aversion
-rises, monotonically, with a correct flat region below γ≈0.01 where the skew is
-too small to bite. The closed form is implemented and it works.
+That is not a bug in the implementation. γ does what the model says it should.
+In the controlled setup in `test_agent.py`, inventory standard deviation falls from
+**63.6 at γ=0.0001 to 7.1 at γ=3**. Across the seven risk levels on the frontier it
+falls from 27.8 to 7.0, with one uptick at γ=0.3. The closed form is implemented
+and it works.
 
 It loses anyway, and the P&L decomposition says why in one line: **adverse
 selection.**
